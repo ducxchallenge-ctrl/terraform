@@ -1,0 +1,67 @@
+name: Deploy Dev
+
+on:
+  repository_dispatch:
+    types: [deploy-dev]
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy dev environment
+    runs-on: ubuntu-latest
+    env:
+      AWS_ROLE_TO_ASSUME: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+      AWS_REGION: ${{ vars.AWS_REGION }}
+      APP_NAME: ${{ vars.APP_NAME }}
+      TF_STATE_BUCKET: ${{ vars.TF_STATE_BUCKET }}
+      TF_LOCK_TABLE: ${{ vars.TF_LOCK_TABLE }}
+      ARTIFACT_BUCKET: ${{ vars.ARTIFACT_BUCKET }}
+      DEPLOY_ENV: ${{ github.event.client_payload.env }}
+      LAMBDA_S3_KEY: ${{ github.event.client_payload.s3Key }}
+      LAMBDA_SOURCE_CODE_HASH: ${{ github.event.client_payload.sourceCodeHash }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform init
+        working-directory: envs/dev
+        run: |
+          terraform init \
+            -backend-config="bucket=${TF_STATE_BUCKET}" \
+            -backend-config="dynamodb_table=${TF_LOCK_TABLE}" \
+            -backend-config="key=${DEPLOY_ENV}/terraform.tfstate"
+
+      - name: Terraform plan
+        working-directory: envs/dev
+        run: |
+          terraform plan \
+            -input=false \
+            -var "app_name=${APP_NAME}" \
+            -var "aws_region=${AWS_REGION}" \
+            -var "artifact_bucket=${ARTIFACT_BUCKET}" \
+            -var "lambda_s3_key=${LAMBDA_S3_KEY}" \
+            -var "lambda_source_code_hash=${LAMBDA_SOURCE_CODE_HASH}"
+
+      - name: Terraform apply
+        working-directory: envs/dev
+        run: |
+          terraform apply \
+            -input=false \
+            -auto-approve \
+            -var "app_name=${APP_NAME}" \
+            -var "aws_region=${AWS_REGION}" \
+            -var "artifact_bucket=${ARTIFACT_BUCKET}" \
+            -var "lambda_s3_key=${LAMBDA_S3_KEY}" \
+            -var "lambda_source_code_hash=${LAMBDA_SOURCE_CODE_HASH}"
