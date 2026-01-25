@@ -23,6 +23,18 @@ variable "lambda_source_code_hash" {
   description = "Base64-encoded SHA256 hash of the Lambda source bundle."
 }
 
+variable "appsync_schema_path" {
+  type        = string
+  description = "Path to the AppSync GraphQL schema file."
+  default     = "../../modules/appsync/schema.graphql"
+}
+
+variable "cognito_domain" {
+  type        = string
+  description = "Optional Cognito hosted UI domain prefix."
+  default     = null
+}
+
 variable "tf_state_bucket" {
   type        = string
   description = "S3 bucket for Terraform state storage."
