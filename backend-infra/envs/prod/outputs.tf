@@ -13,9 +13,19 @@ output "cognito_user_pool_id" {
   value       = module.cognito.user_pool_id
 }
 
-output "cognito_user_pool_client_id" {
-  description = "Cognito user pool client ID."
-  value       = module.cognito.user_pool_client_id
+output "cognito_web_client_id" {
+  description = "Cognito web client ID."
+  value       = module.cognito.web_client_id
+}
+
+output "cognito_ios_client_id" {
+  description = "Cognito iOS client ID."
+  value       = module.cognito.ios_client_id
+}
+
+output "cognito_android_client_id" {
+  description = "Cognito Android client ID."
+  value       = module.cognito.android_client_id
 }
 
 output "dynamodb_table_name" {
