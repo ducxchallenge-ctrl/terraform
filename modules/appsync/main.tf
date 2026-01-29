@@ -16,7 +16,7 @@ variable "schema_path" {
 
 variable "user_pool_id" {
   type        = string
-  description = "Cognito User Pool ID for AppSync authentication."
+  description = "Cognito User Pool ID for AppSßync authentication."
 }
 
 variable "lambda_function_arn" {
