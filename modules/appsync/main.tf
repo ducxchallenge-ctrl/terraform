@@ -31,8 +31,8 @@ locals {
   query_block_matches    = regexall("type Query\\s*\\{([\\s\\S]*?)\\}", local.schema_contents)
   mutation_block_matches = regexall("type Mutation\\s*\\{([\\s\\S]*?)\\}", local.schema_contents)
 
-  query_block    = length(local.query_block_matches) > 0 ? local.query_block_matches[0][1] : ""
-  mutation_block = length(local.mutation_block_matches) > 0 ? local.mutation_block_matches[0][1] : ""
+  query_block    = length(local.query_block_matches) > 0 ? local.query_block_matches[0][0] : ""
+  mutation_block = length(local.mutation_block_matches) > 0 ? local.mutation_block_matches[0][0] : ""
 
   query_fields = distinct(compact([
     for line in split("\n", local.query_block) : (
