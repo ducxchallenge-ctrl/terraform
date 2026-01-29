@@ -11,7 +11,7 @@ variable "aws_region" {
 variable "schema_path" {
   type        = string
   description = "Path to the GraphQL schema file."
-  default     = "${path.module}/schema.graphql"
+  default     = null
 }
 
 variable "user_pool_id" {
@@ -25,7 +25,8 @@ variable "lambda_function_arn" {
 }
 
 locals {
-  schema_contents = file(var.schema_path)
+  schema_path     = coalesce(var.schema_path, "${path.module}/schema.graphql")
+  schema_contents = file(local.schema_path)
 
   query_block_matches    = regexall("type Query\\s*\\{([\\s\\S]*?)\\}", local.schema_contents)
   mutation_block_matches = regexall("type Mutation\\s*\\{([\\s\\S]*?)\\}", local.schema_contents)
