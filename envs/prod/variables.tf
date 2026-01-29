@@ -52,13 +52,3 @@ variable "cognito_domain" {
   description = "Optional Cognito hosted UI domain prefix."
   default     = null
 }
-
-variable "tf_state_bucket" {
-  type        = string
-  description = "S3 bucket for Terraform state storage."
-}
-
-variable "tf_lock_table" {
-  type        = string
-  description = "DynamoDB table for Terraform state locking."
-}

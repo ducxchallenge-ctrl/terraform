@@ -3,4 +3,4 @@ terraform {
 }
 
 # Configure the backend with -backend-config or a backend config file
-# to supply var.tf_state_bucket and var.tf_lock_table.
+# (e.g., bucket, key, use_lockfile).
