@@ -33,11 +33,6 @@ variable "route_bucket" {
   description = "S3 bucket name for route storage."
 }
 
-variable "aws_region" {
-  type        = string
-  description = "AWS region for Lambda environment variables."
-}
-
 variable "environment" {
   type        = string
   description = "Deployment environment name (e.g., dev or prod)."
@@ -61,7 +56,6 @@ resource "aws_lambda_function" "this" {
     variables = {
       TABLE_NAME   = var.table_name
       ROUTE_BUCKET = var.route_bucket
-      AWS_REGION   = var.aws_region
     }
   }
 }

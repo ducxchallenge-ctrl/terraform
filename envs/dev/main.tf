@@ -41,7 +41,6 @@ module "lambda" {
   role_arn               = module.iam.role_arn
   table_name             = module.dynamodb.table_name
   route_bucket           = module.s3_routes.bucket_name
-  aws_region             = var.aws_region
   environment            = "dev"
 }
 
