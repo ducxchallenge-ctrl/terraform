@@ -54,7 +54,7 @@ locals {
     )
   ]))
 
-  datasource_base = regexreplace("${var.app_name}_lambda", "[^A-Za-z0-9_]", "_")
+  datasource_base = replace("${var.app_name}_lambda", "/[^A-Za-z0-9_]/", "_")
   datasource_name = substr(
     can(regex("^[A-Za-z]", local.datasource_base)) ? local.datasource_base : "ds_${local.datasource_base}",
     0,
