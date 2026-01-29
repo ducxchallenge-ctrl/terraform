@@ -3,7 +3,18 @@ name: Deploy Dev
 on:
   repository_dispatch:
     types: [deploy-dev]
-  workflow_dispatch:  
+  workflow_dispatch:
+    inputs:
+      env:
+        description: Environment name (used in state key)
+        required: true
+        default: dev
+      s3Key:
+        description: Lambda artifact S3 key
+        required: true
+      sourceCodeHash:
+        description: Base64-encoded SHA256 hash of the Lambda bundle
+        required: true
 
 permissions:
   id-token: write
@@ -42,6 +53,35 @@ jobs:
           echo "ARTIFACT_BUCKET=$ARTIFACT_BUCKET"
           echo "INFRA_REPO=$INFRA_REPO"
           echo "ENV_TARGET=$ENV_TARGET"        
+
+      - name: Normalize backend config
+        shell: bash
+        env:
+          INPUT_ENV: ${{ inputs.env }}
+          INPUT_S3_KEY: ${{ inputs.s3Key }}
+          INPUT_SOURCE_CODE_HASH: ${{ inputs.sourceCodeHash }}
+        run: |
+          env_value="${INPUT_ENV}"
+          if [ -z "${env_value}" ]; then
+            env_value="${DEPLOY_ENV}"
+          fi
+          if [ -z "${env_value}" ]; then
+            env_value="dev"
+          fi
+          env_value="${env_value#/}"
+          env_value="${env_value%/}"
+          echo "DEPLOY_ENV=${env_value}" >> "$GITHUB_ENV"
+
+          bucket_value="${TF_STATE_BUCKET#/}"
+          bucket_value="${bucket_value%/}"
+          echo "TF_STATE_BUCKET=${bucket_value}" >> "$GITHUB_ENV"
+
+          if [ -n "${INPUT_S3_KEY}" ]; then
+            echo "LAMBDA_S3_KEY=${INPUT_S3_KEY}" >> "$GITHUB_ENV"
+          fi
+          if [ -n "${INPUT_SOURCE_CODE_HASH}" ]; then
+            echo "LAMBDA_SOURCE_CODE_HASH=${INPUT_SOURCE_CODE_HASH}" >> "$GITHUB_ENV"
+          fi
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
