@@ -58,7 +58,7 @@ jobs:
 
       - name: Terraform fmt
         working-directory: envs/dev
-        run: terraform fmt -check -recursive
+        run: terraform fmt -recursive -check -diff
 
       - name: Terraform init
         working-directory: envs/dev
