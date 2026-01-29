@@ -53,6 +53,13 @@ locals {
       )
     )
   ]))
+
+  datasource_base = regexreplace("${var.app_name}_lambda", "[^A-Za-z0-9_]", "_")
+  datasource_name = substr(
+    can(regex("^[A-Za-z]", local.datasource_base)) ? local.datasource_base : "ds_${local.datasource_base}",
+    0,
+    50
+  )
 }
 
 resource "aws_appsync_graphql_api" "this" {
@@ -102,7 +109,7 @@ resource "aws_iam_role_policy" "appsync_lambda" {
 
 resource "aws_appsync_datasource" "lambda" {
   api_id           = aws_appsync_graphql_api.this.id
-  name             = "${var.app_name}-lambda"
+  name             = local.datasource_name
   service_role_arn = aws_iam_role.appsync.arn
   type             = "AWS_LAMBDA"
 
