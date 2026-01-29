@@ -12,6 +12,7 @@ jobs:
   deploy:
     name: Deploy dev environment
     runs-on: ubuntu-latest
+    environment: Development
     env:
       AWS_ROLE_TO_ASSUME: ${{ secrets.AWS_ROLE_TO_ASSUME }}
       AWS_REGION: ${{ vars.AWS_REGION }}
@@ -25,6 +26,22 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Show OIDC subject claim (debug)
+        shell: bash
+        run: |
+          resp=$(curl -sSL -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+          "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=sts.amazonaws.com")
+          token=$(echo "$resp" | python -c "import sys,json; print(json.load(sys.stdin)['value'])")
+          payload=$(echo "$token" | cut -d. -f2 | tr '_-' '/+' | python -c "import sys,base64; print(base64.b64decode(sys.stdin.read() + '==').decode())")
+          echo "OIDC payload: $payload"
+      - name: Debug vars (non-secret)
+        run: |
+          echo "AWS_REGION=$AWS_REGION"
+          echo "AWS_ROLE_TO_ASSUME=$AWS_ROLE_TO_ASSUME"
+          echo "ARTIFACT_BUCKET=$ARTIFACT_BUCKET"
+          echo "INFRA_REPO=$INFRA_REPO"
+          echo "ENV_TARGET=$ENV_TARGET"        
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
