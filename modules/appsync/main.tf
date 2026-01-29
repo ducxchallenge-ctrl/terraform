@@ -38,7 +38,7 @@ locals {
     for line in split("\n", local.query_block) : (
       can(regex("^\\s*#", line)) || can(regex("^\\s*\\}", line)) ? "" : (
         length(regexall("^\\s*([_A-Za-z][_0-9A-Za-z]*)", line)) > 0
-        ? regexall("^\\s*([_A-Za-z][_0-9A-Za-z]*)", line)[0][1]
+        ? regexall("^\\s*([_A-Za-z][_0-9A-Za-z]*)", line)[0][0]
         : ""
       )
     )
@@ -48,7 +48,7 @@ locals {
     for line in split("\n", local.mutation_block) : (
       can(regex("^\\s*#", line)) || can(regex("^\\s*\\}", line)) ? "" : (
         length(regexall("^\\s*([_A-Za-z][_0-9A-Za-z]*)", line)) > 0
-        ? regexall("^\\s*([_A-Za-z][_0-9A-Za-z]*)", line)[0][1]
+        ? regexall("^\\s*([_A-Za-z][_0-9A-Za-z]*)", line)[0][0]
         : ""
       )
     )
